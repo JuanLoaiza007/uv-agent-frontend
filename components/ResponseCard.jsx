@@ -1,0 +1,203 @@
+"use client";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ExternalLink,
+  FileText,
+  Globe,
+  Building2,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+} from "lucide-react";
+import { DOMAINS } from "@/lib/mocks";
+
+/**
+ * ResponseCard - Ficha de Trámite
+ *
+ * Según filosofia-interfaz.md, la respuesta final debe ser una "Ficha de Trámite":
+ * - Encabezado: Indica el área oficial (ej. Trámite Administrativo).
+ * - Respuesta: Concisa (máximo 6 líneas).
+ * - Metadatos de la Fuente: Un pequeño recuadro con el nombre de la resolución.
+ * - Botón de Acción: Enlace directo al SIRA o al portal de pagos.
+ */
+
+const SOURCE_TYPE_ICONS = {
+  normativa: FileText,
+  web: Globe,
+  sistema: Building2,
+  documento: FileText,
+  externo: Globe,
+};
+
+const SOURCE_STATUS_ICONS = {
+  vigente: CheckCircle,
+  actualizado: CheckCircle,
+  disponible: CheckCircle,
+  desactualizado: Clock,
+  no_disponible: AlertCircle,
+};
+
+const SOURCE_STATUS_COLORS = {
+  vigente: "text-green-600",
+  actualizado: "text-green-600",
+  disponible: "text-green-600",
+  desactualizado: "text-amber-600",
+  no_disponible: "text-red-600",
+};
+
+function SourceItem({ source }) {
+  const TypeIcon = SOURCE_TYPE_ICONS[source.type] || FileText;
+  const StatusIcon = SOURCE_STATUS_ICONS[source.status] || Clock;
+  const statusColor = SOURCE_STATUS_COLORS[source.status] || "text-gray-500";
+
+  return (
+    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors">
+      <div className="flex items-center gap-2">
+        <TypeIcon className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm font-medium">{source.name}</span>
+      </div>
+      <div className={`flex items-center gap-1 ${statusColor}`}>
+        <StatusIcon className="h-3 w-3" />
+        <span className="text-xs capitalize">{source.status}</span>
+      </div>
+    </div>
+  );
+}
+
+function ResponseSkeleton() {
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-4 w-48 mt-2" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <Separator />
+        <Skeleton className="h-20 w-full" />
+      </CardContent>
+      <CardFooter>
+        <Skeleton className="h-10 w-24" />
+      </CardFooter>
+    </Card>
+  );
+}
+
+export function ResponseCard({ response, isLoading = false }) {
+  if (isLoading) {
+    return <ResponseSkeleton />;
+  }
+
+  if (!response) {
+    return null;
+  }
+
+  const domain = DOMAINS[response.detected_domain];
+  const domainLabel = domain?.label || response.detected_domain;
+
+  return (
+    <Card className="w-full overflow-hidden">
+      {/* Encabezado con área oficial */}
+      <CardHeader className="bg-muted/30 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardDescription className="text-xs uppercase tracking-wide mb-1">
+              Área de consulta
+            </CardDescription>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-[#C8102E]" />
+              {domainLabel}
+            </CardTitle>
+          </div>
+          {response.domain_confidence && (
+            <Badge variant="outline" className="text-xs">
+              {Math.round(response.domain_confidence * 100)}% confianza
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
+
+      {/* Respuesta concisa */}
+      <CardContent className="pt-4 space-y-4">
+        <div>
+          <h4 className="text-sm font-medium text-muted-foreground mb-2">
+            Respuesta
+          </h4>
+          <p className="text-sm leading-relaxed">{response.answer}</p>
+        </div>
+
+        {/* Metadatos de fuentes */}
+        {response.sources && response.sources.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                Fuentes consultadas
+              </h4>
+              <div className="space-y-2">
+                {response.sources.map((source, index) => (
+                  <SourceItem key={index} source={source} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Botones de acción */}
+        {response.action_links && response.action_links.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                Acciones disponibles
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {response.action_links.map((link, index) => (
+                  <Button
+                    key={index}
+                    variant={link.type === "primary" ? "default" : "outline"}
+                    size="sm"
+                    asChild
+                    className={
+                      link.type === "primary"
+                        ? "bg-[#C8102E] hover:bg-[#A00D24]"
+                        : ""
+                    }
+                  >
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                      <ExternalLink className="ml-2 h-3 w-3" />
+                    </a>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </CardContent>
+
+      {/* Footer con pregunta original */}
+      <CardFooter className="bg-muted/30 text-xs text-muted-foreground">
+        <span className="truncate">Consulta: "{response.question}"</span>
+      </CardFooter>
+    </Card>
+  );
+}
