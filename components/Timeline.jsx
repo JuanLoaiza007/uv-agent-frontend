@@ -144,10 +144,10 @@ export function Timeline({ events = [], isLoading = false }) {
   if (isLoading) {
     return (
       <Card className="w-full h-full flex flex-col">
-        <CardHeader className="py-0 px-4 mb-0">
+        <CardHeader className="px-4 mb-0">
           <CardTitle className="text-sm">Proceso de búsqueda</CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto py-0 px-4">
+        <CardContent className="flex-1 overflow-y-auto px-4">
           <TimelineSkeleton />
         </CardContent>
       </Card>
@@ -160,10 +160,10 @@ export function Timeline({ events = [], isLoading = false }) {
 
   return (
     <Card className="w-full h-full flex flex-col">
-      <CardHeader className="py-0 px-4 mb-0">
+      <CardHeader className="px-4 mb-0">
         <CardTitle className="text-sm">Proceso de búsqueda</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto py-0 px-4">
+      <CardContent className="flex-1 overflow-y-auto px-4">
         <div className="relative">
           {events.map((event, index) => (
             <TimelineItem

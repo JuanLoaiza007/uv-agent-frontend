@@ -81,18 +81,18 @@ function SourceItem({ source }) {
 function ResponseSkeleton() {
   return (
     <Card className="w-full h-full flex flex-col">
-      <CardHeader className="py-0 px-4 mb-0">
+      <CardHeader className="px-4 mb-0">
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-4 w-48 mt-1" />
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto py-0 px-4 space-y-4">
+      <CardContent className="flex-1 overflow-y-auto px-4 space-y-4">
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-3/4" />
         <Separator />
         <Skeleton className="h-20 w-full" />
       </CardContent>
-      <CardFooter className="py-0 px-4">
+      <CardFooter className="px-4">
         <Skeleton className="h-10 w-24" />
       </CardFooter>
     </Card>
@@ -114,7 +114,7 @@ export function ResponseCard({ response, isLoading = false }) {
   return (
     <Card className="w-full h-full flex flex-col overflow-hidden">
       {/* Encabezado con área oficial */}
-      <CardHeader className="py-0 px-4 mb-0">
+      <CardHeader className="px-4 mb-0">
         <div className="flex items-center justify-between">
           <div>
             <CardDescription className="text-xs uppercase tracking-wide mb-0">
@@ -134,7 +134,7 @@ export function ResponseCard({ response, isLoading = false }) {
       </CardHeader>
 
       {/* Respuesta concisa */}
-      <CardContent className="flex-1 overflow-y-auto py-0 px-4">
+      <CardContent className="flex-1 overflow-y-auto px-4">
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-2">
             Respuesta
@@ -197,7 +197,7 @@ export function ResponseCard({ response, isLoading = false }) {
       </CardContent>
 
       {/* Footer con pregunta original */}
-      <CardFooter className="py-0 px-4 text-xs text-muted-foreground">
+      <CardFooter className="px-4 text-xs text-muted-foreground">
         <span className="truncate">Consulta: "{response.question}"</span>
       </CardFooter>
     </Card>
