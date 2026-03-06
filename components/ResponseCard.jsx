@@ -22,6 +22,8 @@ import {
   Clock,
 } from "lucide-react";
 import { DOMAINS } from "@/lib/constants";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /**
  * ResponseCard - Ficha de Trámite
@@ -137,7 +139,7 @@ export function ResponseCard({ response, isLoading = false }) {
           <h4 className="text-sm font-medium text-muted-foreground mb-2">
             Respuesta
           </h4>
-          <p className="text-sm leading-relaxed">{response.answer}</p>
+          <Markdown remarkPlugins={[remarkGfm]}>{response.answer}</Markdown>
         </div>
 
         {/* Metadatos de fuentes */}

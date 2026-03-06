@@ -15,40 +15,80 @@ import {
   Sparkles,
   CheckCircle2,
   Circle,
+  FileText,
+  ExternalLink,
+  BookOpen,
+  Bot,
 } from "lucide-react";
 
 /**
  * Timeline - Timeline de Razonamiento
  *
  * Muestra el flujo de los agentes de forma visual.
- * Según filosofia-interfiz.md:
- * 1. Identificando área: "Bienestar Estudiantil" detectado.
- * 2. Consultando fuentes: "Revisando Resolución 091 de 2004 (Subsidios)".
- * 3. Búsqueda externa: "Consultando portal de Vicebienestar vía Serper".
  */
 
 const STEP_ICONS = {
   planning: Search,
   domain_detected: CheckCircle2,
+  // Búsqueda en base de conocimiento
+  vector_search: Database,
+  // Búsqueda en web
+  web_search: Globe,
+  search_web_pages: Globe,
+  // Inspección de páginas
+  inspect_web_page: ExternalLink,
+  page_inspection: ExternalLink,
+  // Inspección de PDFs
+  inspect_pdf_document: FileText,
+  pdf_inspection: FileText,
+  read_pdf_section: BookOpen,
+  // Planificación y evaluación
+  planner: Bot,
+  replanner: Bot,
+  // Respuesta final
+  synthesizing: Sparkles,
+  final_response: Sparkles,
+  // Otros
   searching: Database,
   external_search: Globe,
-  synthesizing: Sparkles,
 };
 
 const STEP_LABELS = {
   planning: "Analizando consulta",
   domain_detected: "Dominio detectado",
+  vector_search: "Buscando en documentos",
+  web_search: "Buscando en internet",
+  search_web_pages: "Buscando en internet",
+  inspect_web_page: "Inspeccionando página",
+  page_inspection: "Inspeccionando página",
+  inspect_pdf_document: "Leyendo documento PDF",
+  pdf_inspection: "Leyendo documento PDF",
+  read_pdf_section: "Leyendo sección de PDF",
+  planner: "Generando plan",
+  replanner: "Evaluando progreso",
+  synthesizing: "Generando respuesta",
+  final_response: "Generando respuesta",
   searching: "Consultando fuentes",
   external_search: "Búsqueda externa",
-  synthesizing: "Generando respuesta",
 };
 
 const STEP_COLORS = {
   planning: "text-blue-500",
   domain_detected: "text-green-500",
+  vector_search: "text-amber-500",
+  web_search: "text-purple-500",
+  search_web_pages: "text-purple-500",
+  inspect_web_page: "text-cyan-500",
+  page_inspection: "text-cyan-500",
+  inspect_pdf_document: "text-orange-500",
+  pdf_inspection: "text-orange-500",
+  read_pdf_section: "text-orange-600",
+  planner: "text-indigo-500",
+  replanner: "text-indigo-500",
+  synthesizing: "text-pink-500",
+  final_response: "text-pink-500",
   searching: "text-amber-500",
   external_search: "text-purple-500",
-  synthesizing: "text-pink-500",
 };
 
 function TimelineItem({ event, isLast }) {

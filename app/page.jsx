@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchBar } from "@/components/SearchBar";
 import { DomainTags } from "@/components/DomainTags";
 import { Timeline } from "@/components/Timeline";
 import { ResponseCard } from "@/components/ResponseCard";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // URL del backend desde variables de entorno
 const BACKEND_URL =
@@ -25,28 +29,64 @@ export default function Home() {
   const [timelineEvents, setTimelineEvents] = useState([]);
   const [activeDomain, setActiveDomain] = useState(null);
   const [domainConfidence, setDomainConfidence] = useState(null);
+  const [systemStatus, setSystemStatus] = useState(null);
+
+  // Fetch health status on mount
+  useEffect(() => {
+    const fetchHealth = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/health`);
+        const data = await res.json();
+        setSystemStatus(data);
+      } catch (e) {
+        setSystemStatus({ status: "error", agent: "unknown" });
+      }
+    };
+    fetchHealth();
+  }, []);
 
   // Mapeo de eventos del backend al formato del Timeline
-  // Según documentación: prompt_agent_stream_api.md
+  // Mapea action_type del backend a los steps del Timeline
   const mapBackendEventToTimeline = (eventType, data) => {
+    const actionType = data.action_type;
+
     switch (eventType) {
       case "action_start":
-        // Mapear según el tipo de acción
-        if (data.action_type === "domain_detector") {
+        // Mapear según el tipo de acción del agente
+        if (actionType === "domain_detector") {
           return { step: "planning", message: data.message };
         }
-        if (data.action_type === "vector_search") {
-          return { step: "searching", message: data.message };
+        if (actionType === "vector_search") {
+          return { step: "vector_search", message: data.message };
+        }
+        if (actionType === "web_search" || actionType === "search_web_pages") {
+          return { step: "web_search", message: data.message };
         }
         if (
-          data.action_type === "search_web_pages" ||
-          data.action_type === "web_search"
+          actionType === "inspect_web_page" ||
+          actionType === "page_inspection"
         ) {
-          return { step: "external_search", message: data.message };
+          return { step: "inspect_web_page", message: data.message };
         }
-        if (data.action_type === "final_response") {
-          return { step: "synthesizing", message: data.message };
+        if (
+          actionType === "inspect_pdf_document" ||
+          actionType === "pdf_inspection"
+        ) {
+          return { step: "inspect_pdf_document", message: data.message };
         }
+        if (actionType === "read_pdf_section") {
+          return { step: "read_pdf_section", message: data.message };
+        }
+        if (actionType === "planner") {
+          return { step: "planner", message: data.message };
+        }
+        if (actionType === "replanner") {
+          return { step: "replanner", message: data.message };
+        }
+        if (actionType === "final_response") {
+          return { step: "final_response", message: data.message };
+        }
+        // Por defecto, mostrar el message del agente sin step específico
         return { step: "planning", message: data.message };
       case "domain_detected":
         return {
@@ -150,7 +190,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="flex flex-col w-full h-full m-0 p-0">
       {/* Header */}
       <header className="border-b bg-card shrink-0">
         <div className="container mx-auto px-4 py-3">
@@ -162,19 +202,31 @@ export default function Home() {
               <div>
                 <h1 className="font-semibold text-base">Sistema de Consulta</h1>
                 <p className="text-xs text-muted-foreground">
-                  Universidad del Valle
+                  Tesis Juan & Julián
                 </p>
               </div>
             </div>
-            <div className="text-xs text-muted-foreground hidden sm:block">
-              Tesis Juan & Julián
+            <div className="text-xs text-center text-muted-foreground hidden sm:block">
+              {systemStatus ? (
+                <Badge
+                  className={`text-xs ${
+                    systemStatus.status === "ok"
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-red-500 hover:bg-red-600"
+                  }`}
+                >
+                  {systemStatus.status === "ok" ? "Online" : "Offline"}
+                </Badge>
+              ) : (
+                <Skeleton className="h-5 w-14 rounded-full" />
+              )}
             </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section - Buscador Central */}
-      <section className="container mx-auto px-4 py-6 lg:py-8">
+      <section className="flex flex-col container mx-auto px-4 py-6 lg:py-8">
         <div className="text-center mb-6">
           <h2 className="text-2xl lg:text-3xl font-bold mb-2">
             ¿En qué podemos ayudarte?
@@ -193,14 +245,11 @@ export default function Home() {
 
       {/* Results Section - Altura máxima para mantener todo en pantalla */}
       {(isLoading || response || timelineEvents.length > 0) && (
-        <section className="container mx-auto px-4 pb-4 flex-1 min-h-0">
+        <section className="container mx-auto px-4 pb-4 flex-1">
           {/* Contenedor con altura máxima */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[50vh] lg:h-[55vh] min-h-[300px]">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Timeline - Columna izquierda con scroll */}
-            <div className="lg:col-span-1 overflow-hidden bg-muted/20 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
-                Proceso de búsqueda
-              </h3>
+            <div className="lg:col-span-1 bg-muted/20 rounded-lg p-3 max-h-100">
               <div className="h-[calc(100%-28px)] overflow-y-auto pr-1">
                 <Timeline
                   events={timelineEvents}
@@ -211,6 +260,7 @@ export default function Home() {
 
             {/* Response Card - Columna derecha */}
             <div className="lg:col-span-2 overflow-hidden">
+              {/* <Markdown remarkPlugins={[remarkGfm]}>Content</Markdown> */}
               <div className="h-full overflow-y-auto">
                 <ResponseCard
                   response={response}
@@ -226,9 +276,15 @@ export default function Home() {
       <footer className="border-t bg-muted/30 py-2 shrink-0">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
           <p>
-            Sistema de pregunta y respuesta agéntico - Universidad del Valle
+            El agente puede generar respuestas inexactas. Es responsabilidad del
+            usuario verificar la información crítica mediante fuentes oficiales.
           </p>
-          <p className="text-[10px]">Tesis de grado</p>
+          <p className="text-[10px]">
+            Este sistema opera de forma independiente; la Universidad del Valle
+            no ha participado en su desarrollo, no supervisa sus procesos de
+            recopilación ni se responsabiliza por la integridad de los datos
+            proporcionados.
+          </p>
         </div>
       </footer>
     </main>
