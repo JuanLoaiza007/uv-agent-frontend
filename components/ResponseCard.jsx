@@ -21,7 +21,7 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react";
-import { DOMAINS } from "@/lib/mocks";
+import { DOMAINS } from "@/lib/constants";
 
 /**
  * ResponseCard - Ficha de Trámite

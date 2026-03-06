@@ -2,6 +2,25 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Altura máxima y control de scroll */
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

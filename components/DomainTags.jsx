@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { DOMAINS } from "@/lib/mocks";
+import { DOMAINS } from "@/lib/constants";
 
 /**
  * DomainTags - Barra de Estado de Dominios
