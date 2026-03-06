@@ -182,20 +182,20 @@ export default function Home() {
             : "py-6 lg:py-8"
         }`}
       >
-        <div className="text-center mb-6">
-          <h2 className="text-xl lg:text-3xl font-bold mb-2">
+        <div className="text-center mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl lg:text-3xl font-bold mb-1 sm:mb-2">
             ¿En qué podemos ayudarte?
           </h2>
-          <p className="text-muted-foreground text-xs lg:text-base">
-            Consulta información sobre trámites, servicios y recursos de la
-            Universidad del Valle
+          <p className="text-muted-foreground text-xs sm:text-xs lg:text-base">
+            Consulta información sobre trámites y servicios de la Universidad
+            del Valle
           </p>
         </div>
 
         <SearchBar onSearch={handleSearch} isLoading={isLoading} />
 
         {/* Barra de Estado de Dominios */}
-        <div className="mt-4">
+        <div className="mt-2 sm:mt-4">
           <DomainTags
             activeDomain={activeDomain}
             confidence={domainConfidence}
@@ -205,7 +205,7 @@ export default function Home() {
 
       {/* Results Section - Altura máxima para mantener todo en pantalla */}
       {(isLoading || response || timelineEvents.length > 0) && (
-        <section className="container mx-auto px-4 pb-4 flex-1 overflow-hidden">
+        <section className="container mx-auto px-2 sm:px-4 pb-2 sm:pb-4 flex-1 overflow-hidden">
           {/* Contenedor con altura máxima */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
             {/* Timeline - Columna izquierda con scroll */}

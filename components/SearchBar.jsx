@@ -32,15 +32,15 @@ export function SearchBar({ onSearch, isLoading = false }) {
     <div className="w-full max-w-3xl mx-auto">
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground sm:left-4 sm:h-5 sm:w-5" />
           <Input
             type="text"
-            placeholder="Pregunta sobre matrícula, becas, servicios de salud, intercambios o investigación..."
+            placeholder="Pregunta sobre matrícula, becas, servicios..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            className="pl-12 pr-24 h-14 text-lg rounded-xl border-2 border-border focus:border-primary shadow-lg"
+            className="pl-10 pr-20 h-11 text-base rounded-lg border-2 border-border focus:border-primary shadow-md"
           />
           <Button
             type="submit"
@@ -55,8 +55,8 @@ export function SearchBar({ onSearch, isLoading = false }) {
           </Button>
         </div>
       </form>
-      <p className="text-center text-sm text-muted-foreground mt-3">
-        Sistema de consulta agéntico para la Universidad del Valle sede Meléndez
+      <p className="text-center text-xs text-muted-foreground mt-2 hidden sm:block">
+        Sistema de consulta agéntico - Universidad del Valle
       </p>
     </div>
   );

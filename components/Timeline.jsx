@@ -26,7 +26,18 @@ import {
  * Timeline - Timeline de Razonamiento
  *
  * Muestra el flujo de los agentes de forma visual.
+ *
+ * CONFIGURATION FLAGS:
+ * - GRAYSCALE_OLD_STEPS: Si es true, los pasos anteriores al último se muestran en gris
+ * - REVERSE_ORDER: Si es true, los pasos más recientes aparecen primero (al revés)
  */
+
+// === CONFIGURATION FLAGS ===
+// Cambiar a true para activar el comportamiento
+const GRAYSCALE_OLD_STEPS = true; // Los pasos anteriores al último se ven grises
+const REVERSE_ORDER = true; // Los pasos más nuevos aparecen primero
+
+// =============================
 
 const STEP_ICONS = {
   planning: Search,
@@ -92,21 +103,26 @@ const STEP_COLORS = {
   external_search: "text-purple-500",
 };
 
-function TimelineItem({ event, isLast }) {
+function TimelineItem({ event, isLast, grayscaleOldSteps = false }) {
   const Icon = STEP_ICONS[event.step] || Circle;
   const colorClass = STEP_COLORS[event.step] || "text-gray-400";
   const label = STEP_LABELS[event.step] || event.step;
 
+  // Si grayscaleOldSteps está activo y NO es el último paso, usar colores grises
+  const isGrayscale = grayscaleOldSteps && !isLast;
+  const iconColor = isGrayscale ? "text-gray-400" : colorClass;
+  const textColor = isGrayscale ? "text-gray-400" : "";
+
   return (
     <div className="flex items-start gap-3 pb-4">
       <div className="flex flex-col items-center">
-        <div className={`rounded-full p-1 ${colorClass}`}>
+        <div className={`rounded-full p-1 ${iconColor}`}>
           <Icon className="h-4 w-4" />
         </div>
         {!isLast && <div className="w-px h-full bg-border min-h-4" />}
       </div>
       <div className="flex-1 pb-2">
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${textColor}`}>
           <span className="text-sm font-medium">{label}</span>
           {event.step === "domain_detected" && (
             <Badge variant="secondary" className="text-xs">
@@ -115,7 +131,9 @@ function TimelineItem({ event, isLast }) {
           )}
         </div>
         {event.step !== "domain_detected" && (
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p
+            className={`text-sm mt-0.5 ${isGrayscale ? "text-gray-400" : "text-muted-foreground"}`}
+          >
             {event.message}
           </p>
         )}
@@ -158,6 +176,9 @@ export function Timeline({ events = [], isLoading = false }) {
     return null;
   }
 
+  // Aplicar reverse order si está configurado
+  const displayEvents = REVERSE_ORDER ? [...events].reverse() : events;
+
   return (
     <Card className="w-full h-full flex flex-col">
       <CardHeader className="px-4 mb-0">
@@ -165,11 +186,14 @@ export function Timeline({ events = [], isLoading = false }) {
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto px-4">
         <div className="relative">
-          {events.map((event, index) => (
+          {displayEvents.map((event, index) => (
             <TimelineItem
               key={index}
               event={event}
-              isLast={index === events.length - 1}
+              isLast={
+                REVERSE_ORDER ? index === 0 : index === displayEvents.length - 1
+              }
+              grayscaleOldSteps={GRAYSCALE_OLD_STEPS}
             />
           ))}
         </div>
@@ -202,6 +226,9 @@ export function TimelineAccordion({ events = [], isLoading = false }) {
     return null;
   }
 
+  // Aplicar reverse order si está configurado
+  const displayEvents = REVERSE_ORDER ? [...events].reverse() : events;
+
   return (
     <Accordion type="single" collapsible defaultValue="timeline">
       <AccordionItem value="timeline">
@@ -210,11 +237,16 @@ export function TimelineAccordion({ events = [], isLoading = false }) {
         </AccordionTrigger>
         <AccordionContent>
           <div className="relative">
-            {events.map((event, index) => (
+            {displayEvents.map((event, index) => (
               <TimelineItem
                 key={index}
                 event={event}
-                isLast={index === events.length - 1}
+                isLast={
+                  REVERSE_ORDER
+                    ? index === 0
+                    : index === displayEvents.length - 1
+                }
+                grayscaleOldSteps={GRAYSCALE_OLD_STEPS}
               />
             ))}
           </div>
