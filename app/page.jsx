@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SearchBar } from "@/components/SearchBar";
 import { DomainTags } from "@/components/DomainTags";
 import { Timeline } from "@/components/Timeline";
 import { ResponseCard } from "@/components/ResponseCard";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -29,21 +27,6 @@ export default function Home() {
   const [timelineEvents, setTimelineEvents] = useState([]);
   const [activeDomain, setActiveDomain] = useState(null);
   const [domainConfidence, setDomainConfidence] = useState(null);
-  const [systemStatus, setSystemStatus] = useState(null);
-
-  // Fetch health status on mount
-  useEffect(() => {
-    const fetchHealth = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/health`);
-        const data = await res.json();
-        setSystemStatus(data);
-      } catch (e) {
-        setSystemStatus({ status: "error", agent: "unknown" });
-      }
-    };
-    fetchHealth();
-  }, []);
 
   // Mapeo de eventos del backend al formato del Timeline
   // Mapea action_type del backend a los steps del Timeline
@@ -190,48 +173,20 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col w-full h-full m-0 p-0">
-      {/* Header */}
-      <header className="border-b bg-card shrink-0">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#C8102E] flex items-center justify-center">
-                <span className="text-white font-bold text-sm">UV</span>
-              </div>
-              <div>
-                <h1 className="font-semibold text-base">Sistema de Consulta</h1>
-                <p className="text-xs text-muted-foreground">
-                  Tesis Juan & Julián
-                </p>
-              </div>
-            </div>
-            <div className="text-xs text-center text-muted-foreground hidden sm:block">
-              {systemStatus ? (
-                <Badge
-                  className={`text-xs ${
-                    systemStatus.status === "ok"
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-red-500 hover:bg-red-600"
-                  }`}
-                >
-                  {systemStatus.status === "ok" ? "Online" : "Offline"}
-                </Badge>
-              ) : (
-                <Skeleton className="h-5 w-14 rounded-full" />
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="flex flex-col h-full w-full overflow-hidden">
       {/* Hero Section - Buscador Central */}
-      <section className="flex flex-col container mx-auto px-4 py-6 lg:py-8">
+      <section
+        className={`flex flex-col container mx-auto px-4 ${
+          !isLoading && !response && timelineEvents.length === 0
+            ? "flex-1 justify-center"
+            : "py-6 lg:py-8"
+        }`}
+      >
         <div className="text-center mb-6">
-          <h2 className="text-2xl lg:text-3xl font-bold mb-2">
+          <h2 className="text-xl lg:text-3xl font-bold mb-2">
             ¿En qué podemos ayudarte?
           </h2>
-          <p className="text-muted-foreground text-sm lg:text-base">
+          <p className="text-muted-foreground text-xs lg:text-base">
             Consulta información sobre trámites, servicios y recursos de la
             Universidad del Valle
           </p>
@@ -240,17 +195,22 @@ export default function Home() {
         <SearchBar onSearch={handleSearch} isLoading={isLoading} />
 
         {/* Barra de Estado de Dominios */}
-        <DomainTags activeDomain={activeDomain} confidence={domainConfidence} />
+        <div className="mt-4">
+          <DomainTags
+            activeDomain={activeDomain}
+            confidence={domainConfidence}
+          />
+        </div>
       </section>
 
       {/* Results Section - Altura máxima para mantener todo en pantalla */}
       {(isLoading || response || timelineEvents.length > 0) && (
-        <section className="container mx-auto px-4 pb-4 flex-1">
+        <section className="container mx-auto px-4 pb-4 flex-1 overflow-hidden">
           {/* Contenedor con altura máxima */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
             {/* Timeline - Columna izquierda con scroll */}
-            <div className="lg:col-span-1 bg-muted/20 rounded-lg p-3 max-h-100">
-              <div className="h-[calc(100%-28px)] overflow-y-auto pr-1">
+            <div className="lg:col-span-1 bg-muted/20 rounded-lg p-3 overflow-hidden">
+              <div className="h-full overflow-y-auto pr-1">
                 <Timeline
                   events={timelineEvents}
                   isLoading={isLoading && timelineEvents.length === 0}
@@ -271,22 +231,6 @@ export default function Home() {
           </div>
         </section>
       )}
-
-      {/* Footer */}
-      <footer className="border-t bg-muted/30 py-2 shrink-0">
-        <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          <p>
-            El agente puede generar respuestas inexactas. Es responsabilidad del
-            usuario verificar la información crítica mediante fuentes oficiales.
-          </p>
-          <p className="text-[10px]">
-            Este sistema opera de forma independiente; la Universidad del Valle
-            no ha participado en su desarrollo, no supervisa sus procesos de
-            recopilación ni se responsabiliza por la integridad de los datos
-            proporcionados.
-          </p>
-        </div>
-      </footer>
-    </main>
+    </div>
   );
 }

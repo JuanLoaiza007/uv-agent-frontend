@@ -15,7 +15,7 @@ export function DomainTags({ activeDomain = null, confidence = null }) {
   const domainList = Object.values(DOMAINS);
 
   return (
-    <div className="flex flex-wrap justify-center gap-2 mt-6">
+    <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
       {domainList.map((domain) => {
         const isActive = activeDomain === domain.id;
 
@@ -24,18 +24,17 @@ export function DomainTags({ activeDomain = null, confidence = null }) {
             key={domain.id}
             variant={isActive ? "default" : "outline"}
             className={`
-              px-4 py-2 text-sm transition-all duration-300 cursor-default
+              px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm transition-all duration-300 cursor-default select-none pointer-events-none
               ${
                 isActive
-                  ? "bg-[#C8102E] hover:bg-[#A00D24] text-white shadow-md scale-105"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-[#C8102E] text-white shadow-md scale-105"
+                  : "text-muted-foreground/60 border-transparent sm:border-border"
               }
             `}
-            title={domain.description}
           >
             {domain.label}
             {isActive && confidence && (
-              <span className="ml-2 text-xs opacity-80">
+              <span className="ml-1 sm:ml-2 text-xs opacity-80">
                 ({Math.round(confidence * 100)}%)
               </span>
             )}
