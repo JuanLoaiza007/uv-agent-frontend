@@ -114,7 +114,7 @@ function TimelineItem({ event, isLast, grayscaleOldSteps = false }) {
   const textColor = isGrayscale ? "text-gray-400" : "";
 
   return (
-    <div className="flex items-start gap-3 pb-4">
+    <div className="flex items-start gap-3 pb-4 animate-in fade-in duration-500">
       <div className="flex flex-col items-center">
         <div className={`rounded-full p-1 ${iconColor}`}>
           <Icon className="h-4 w-4" />

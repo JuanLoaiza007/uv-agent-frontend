@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -57,7 +57,7 @@ export function Header() {
                 {systemStatus.status === "ok" ? "Online" : "Offline"}
               </Badge>
             ) : (
-              <Skeleton className="h-5 w-14 rounded-full" />
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             )}
           </div>
         </div>
