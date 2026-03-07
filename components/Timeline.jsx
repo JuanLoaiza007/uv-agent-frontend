@@ -181,7 +181,7 @@ export function Timeline({ events = [], isLoading = false, className }) {
 
   return (
     <Card className={`w-full h-full flex flex-col ${className || ""}`}>
-      <CardHeader className="px-4 mb-0 pb-2 flex-shrink-0">
+      <CardHeader className="px-4 mb-0 pb-2">
         <CardTitle className="text-sm">Proceso de búsqueda</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto px-2 sm:px-4 min-h-0">

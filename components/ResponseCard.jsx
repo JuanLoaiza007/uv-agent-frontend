@@ -65,7 +65,7 @@ function SourceItem({ source }) {
   const statusColor = SOURCE_STATUS_COLORS[source.status] || "text-gray-500";
 
   return (
-    <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors">
+    <div className="flex items-center justify-between p-2 rounded-md bg-muted">
       <div className="flex items-center gap-2">
         <TypeIcon className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-medium">{source.name}</span>
@@ -153,27 +153,19 @@ export function ResponseCard({ response, isLoading = false, className }) {
       </CardHeader>
 
       {/* Respuesta concisa */}
-      <CardContent className="flex-1 overflow-y-auto px-4">
-        <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-2">
-            Respuesta
-          </h4>
-          <Markdown remarkPlugins={[remarkGfm]}>{response.answer}</Markdown>
-        </div>
-
+      <CardContent className="flex flex-col flex-1 overflow-y-auto px-4 gap-2 py-2">
+        <h4 className="text-sm font-medium text-muted-foreground">Respuesta</h4>
+        <Markdown remarkPlugins={[remarkGfm]}>{response.answer}</Markdown>
         {/* Metadatos de fuentes */}
         {response.sources && response.sources.length > 0 && (
           <>
-            <Separator />
-            <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-2">
-                Fuentes consultadas
-              </h4>
-              <div className="space-y-2">
-                {response.sources.map((source, index) => (
-                  <SourceItem key={index} source={source} />
-                ))}
-              </div>
+            <h4 className="text-sm font-medium text-muted-foreground mt-2">
+              Fuentes consultadas
+            </h4>
+            <div className="space-y-2">
+              {response.sources.map((source, index) => (
+                <SourceItem key={index} source={source} />
+              ))}
             </div>
           </>
         )}
@@ -185,7 +177,7 @@ export function ResponseCard({ response, isLoading = false, className }) {
 
         {/* Botones de acción */}
         {response.action_links && response.action_links.length > 0 && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-full">
             <h4 className="text-sm font-medium">Acciones disponibles</h4>
             <div className="flex flex-wrap gap-2">
               {response.action_links.map((link, index) => (
@@ -194,14 +186,10 @@ export function ResponseCard({ response, isLoading = false, className }) {
                   variant={link.type === "primary" ? "default" : "outline"}
                   size="sm"
                   asChild
-                  className={
-                    link.type === "primary"
-                      ? "bg-[#C8102E] hover:bg-[#A00D24]"
-                      : ""
-                  }
+                  className={`max-w-100`}
                 >
                   <a href={link.url} target="_blank" rel="noopener noreferrer">
-                    {link.label}
+                    <p className="truncate">{link.label}</p>
                     <ExternalLink className="ml-2 h-3 w-3" />
                   </a>
                 </Button>

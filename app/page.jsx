@@ -173,7 +173,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full py-4">
+    <div className="flex flex-col w-full h-full sm:py-12 md:py-24 overflow-y-auto">
       {/* Hero Section - Buscador Central */}
       <section
         className={`flex flex-col container mx-auto px-4 ${
@@ -207,7 +207,7 @@ export default function Home() {
       {(isLoading || response || timelineEvents.length > 0) && (
         <section className="container mx-auto px-2 sm:px-4 pb-16 sm:py-4 flex-1 my-2">
           {/* Contenedor: móvil - stacked sin altura fija, escritorio - grid con altura */}
-          <div className="flex flex-col sm:grid sm:grid-cols-3 gap-2 sm:h-[35vh] lg:h-[45vh]">
+          <div className="flex flex-col md:grid md:grid-cols-3 gap-2 md:h-[35vh] lg:h-[45vh]">
             {/* Timeline - Columna izquierda */}
             <div className="sm:col-span-1">
               <Timeline

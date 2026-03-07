@@ -29,7 +29,7 @@ export function SearchBar({ onSearch, isLoading = false }) {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="w-full lg:max-w-3xl mx-auto">
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground sm:left-4 sm:h-5 sm:w-5" />
