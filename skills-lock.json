@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "refactor:nextjs": {
+      "source": "snakeo/claude-debug-and-refactor-skills-plugin",
+      "sourceType": "github",
+      "computedHash": "6132ab481b5da1ad0a7c6104e7c8c2bc7b28cd44c39e8e27c71e5e72a3e97f76"
+    }
+  }
+}

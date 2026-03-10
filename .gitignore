@@ -4,6 +4,7 @@
 prompts_privados
 
 # dependencies
+/.agents/
 /node_modules
 /.pnp
 .pnp.*
