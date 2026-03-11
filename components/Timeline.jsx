@@ -26,7 +26,8 @@ import {
  * Timeline - Componente que muestra el proceso de búsqueda del agente
  */
 
-// Configuration
+const GRAYSCALE_OLD_STEPS = true;
+const REVERSE_ORDER = true;
 
 const STEP_ICONS = {
   planning: Search,
