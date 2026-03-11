@@ -26,8 +26,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { DOMAINS } from "@/lib/constants";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { AnimatedMarkdown } from "./AnimatedMarkdown";
 
 /**
  * ResponseCard - Tarjeta de respuesta con fuentes y acciones
@@ -181,7 +180,7 @@ export function ResponseCard({ response, isLoading = false, className }) {
       {/* Respuesta concisa */}
       <CardContent className="flex flex-col flex-1 overflow-y-auto px-4 gap-2 py-2">
         <h4 className="text-sm font-medium text-muted-foreground">Respuesta</h4>
-        <Markdown remarkPlugins={[remarkGfm]}>{response.answer}</Markdown>
+        <AnimatedMarkdown content={response.answer} />
         {/* Metadatos de fuentes */}
         {response.sources && response.sources.length > 0 && (
           <>
