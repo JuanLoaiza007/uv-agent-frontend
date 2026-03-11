@@ -272,11 +272,6 @@ export function ResponseCard({ response, isLoading = false, className }) {
               <span className="truncate">{domainLabel}</span>
             </CardTitle>
           </div>
-          {response.domain_confidence && (
-            <Badge variant="outline" className="text-xs flex-shrink-0">
-              {Math.round(response.domain_confidence * 100)}% confianza
-            </Badge>
-          )}
         </div>
       </CardHeader>
 
