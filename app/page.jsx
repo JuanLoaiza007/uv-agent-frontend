@@ -32,9 +32,9 @@ export default function Home() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
             ¿En qué podemos ayudarte?
           </h2>
-          <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
+          <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
             Consulta información sobre trámites y servicios de la Universidad
-            del Valle
+            del Valle en la sede Cali, Meléndez.
           </p>
         </div>
 

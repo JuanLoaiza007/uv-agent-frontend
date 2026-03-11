@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, X } from "lucide-react";
 
 /**
  * SearchBar - Componente de buscador central
@@ -24,11 +24,29 @@ export function SearchBar({ onSearch, isLoading = false }) {
     }
   };
 
+  const handleClear = () => {
+    setQuery("");
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto">
       <form onSubmit={handleSubmit} className="relative w-full">
-        <div className="relative">
-          <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+        <div className="relative flex items-center">
+          {/* Botón buscar - izquierda */}
+          <Button
+            type="submit"
+            variant="ghost"
+            size="icon"
+            disabled={isLoading || !query.trim()}
+            className="absolute left-1.5 sm:left-2 top-1/2 -translate-y-1/2 h-7 w-7 sm:h-8 sm:w-8 rounded-md text-[#C8102E] hover:bg-[#C8102E]/10 hover:text-[#C8102E] disabled:text-muted-foreground disabled:hover:bg-transparent z-10"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4 sm:h-5 sm:w-5" />
+            )}
+          </Button>
+
           <Input
             type="text"
             placeholder="Pregunta sobre matrícula, becas, servicios..."
@@ -36,25 +54,24 @@ export function SearchBar({ onSearch, isLoading = false }) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            className="pl-10 pr-20 h-10 sm:h-11 md:h-12 text-sm sm:text-base rounded-lg border-2 border-border focus:border-primary shadow-sm transition-all"
+            className="pl-10 pr-10 h-10 sm:h-11 md:h-12 text-sm sm:text-base rounded-lg border-2 border-border focus:border-primary shadow-sm transition-all"
           />
-          <Button
-            type="submit"
-            disabled={isLoading || !query.trim()}
-            size="sm"
-            className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-8 sm:h-9 rounded-lg"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <span className="text-xs sm:text-sm">Buscar</span>
-            )}
-          </Button>
+
+          {/* Botón limpiar - derecha */}
+          {query && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleClear}
+              disabled={isLoading}
+              className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-muted hover:bg-muted-foreground/20 text-muted-foreground hover:text-foreground transition-all z-10 flex items-center justify-center"
+            >
+              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+          )}
         </div>
       </form>
-      <p className="text-center text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-2">
-        Sistema de consulta agéntico - Universidad del Valle
-      </p>
     </div>
   );
 }
