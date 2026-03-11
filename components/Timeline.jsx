@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from "motion/react";
  * Timeline - Componente que muestra el proceso de búsqueda del agente
  */
 
-const GRAYSCALE_OLD_STEPS = true;
+const GRAYSCALE_OLD_STEPS = false;
 const REVERSE_ORDER = true;
 
 const STEP_ICONS = {

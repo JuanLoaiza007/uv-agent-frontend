@@ -13,6 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   ExternalLink,
   FileText,
   Globe,
@@ -24,8 +32,10 @@ import {
   Search,
   Database,
   Sparkles,
+  Info,
 } from "lucide-react";
 import { DOMAINS } from "@/lib/constants";
+import { cn, isValidLink } from "@/lib/utils";
 import { AnimatedMarkdown } from "./AnimatedMarkdown";
 
 /**
@@ -40,69 +50,91 @@ const SOURCE_TYPE_ICONS = {
   externo: Globe,
 };
 
-const SOURCE_STATUS_ICONS = {
-  vigente: CheckCircle,
-  actualizado: CheckCircle,
-  disponible: CheckCircle,
-  desactualizado: Clock,
-  no_disponible: AlertCircle,
-};
-
-const SOURCE_STATUS_COLORS = {
-  vigente: "text-green-600",
-  actualizado: "text-green-600",
-  disponible: "text-green-600",
-  desactualizado: "text-amber-600",
-  no_disponible: "text-red-600",
-};
-
-function SourceItem({ source }) {
-  const TypeIcon = SOURCE_TYPE_ICONS[source.type] || FileText;
-  const StatusIcon = SOURCE_STATUS_ICONS[source.status] || Clock;
-  const statusColor = SOURCE_STATUS_COLORS[source.status] || "text-gray-500";
-
-  const isLink = !!source.url;
+function ChunkItem({ chunk }) {
+  // Color del score basado en relevancia
+  const getScoreColor = (score) => {
+    if (score > 0.4) return "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+    if (score > 0.2) return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800";
+    return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700";
+  };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      asChild={isLink}
-      className="w-full justify-between h-auto py-2 px-3 text-left font-normal border-muted-foreground/10 hover:bg-muted/50"
-    >
-      {isLink ? (
-        <a href={source.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between w-full gap-2">
+    <div className="flex flex-col gap-2 p-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div className="flex items-center justify-between gap-2">
+        <Badge variant="outline" className={cn("text-[10px] font-mono", getScoreColor(chunk.score))}>
+          Relevancia: {chunk.score.toFixed(4)}
+        </Badge>
+      </div>
+      <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
+        {chunk.content}
+      </p>
+    </div>
+  );
+}
+
+function SourceItem({ source }) {
+  const isVectorDB = !source.url;
+  const TypeIcon = isVectorDB ? Database : (SOURCE_TYPE_ICONS[source.type] || FileText);
+  
+  // Ordenar chunks por score descendente
+  const sortedChunks = [...(source.chunks || [])].sort((a, b) => b.score - a.score);
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-between h-auto py-2 px-3 text-left font-normal border-muted-foreground/10 hover:bg-muted/50 transition-colors group"
+        >
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <TypeIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <TypeIcon className={cn("h-4 w-4 flex-shrink-0 transition-colors", isVectorDB ? "text-[#C8102E]" : "text-muted-foreground group-hover:text-primary")} />
             <span className="text-sm font-medium truncate flex-1">
               {source.name}
             </span>
-            <ExternalLink className="h-3 w-3 text-muted-foreground/50 flex-shrink-0" />
           </div>
-          <div className={`flex items-center gap-1 flex-shrink-0 ${statusColor}`}>
-            <StatusIcon className="h-3 w-3" />
-            <span className="text-[10px] sm:text-xs capitalize whitespace-nowrap">
-              {source.status}
-            </span>
+          <Info className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col gap-0 p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-4 border-b">
+          <div className="flex items-center gap-2 mb-1">
+            <TypeIcon className={cn("h-5 w-5", isVectorDB ? "text-[#C8102E]" : "text-muted-foreground")} />
+            <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
+              {isVectorDB ? "Vector Database" : source.type}
+            </Badge>
           </div>
-        </a>
-      ) : (
-        <div className="flex items-center justify-between w-full gap-2">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <TypeIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm font-medium truncate flex-1">
-              {source.name}
-            </span>
-          </div>
-          <div className={`flex items-center gap-1 flex-shrink-0 ${statusColor}`}>
-            <StatusIcon className="h-3 w-3" />
-            <span className="text-[10px] sm:text-xs capitalize whitespace-nowrap">
-              {source.status}
-            </span>
-          </div>
+          <DialogTitle className="text-xl line-clamp-2">{source.name}</DialogTitle>
+          <DialogDescription>
+            Fragmentos de información recuperados de esta fuente.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {sortedChunks.length > 0 ? (
+            sortedChunks.map((chunk, idx) => (
+              <ChunkItem key={idx} chunk={chunk} />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+              <Sparkles className="h-8 w-8 mb-2 opacity-20" />
+              <p>No se encontraron fragmentos específicos para esta consulta.</p>
+            </div>
+          )}
         </div>
-      )}
-    </Button>
+
+        {(source.url && isValidLink(source.url)) && (
+          <div className="p-4 border-t bg-muted/30 flex justify-end">
+            <Button asChild size="sm" className="gap-2">
+              <a href={source.url} target="_blank" rel="noopener noreferrer">
+                <span>Ver fuente completa</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -180,6 +212,14 @@ export function ResponseCard({ response, isLoading = false, className }) {
   const domain = DOMAINS[response.detected_domain];
   const domainLabel = domain?.label || response.detected_domain;
 
+  // Filtrar fuentes: se muestran todas, pero validamos el link internamente en el modal
+  const validSources = response.sources || [];
+
+  // Filtrar acciones inválidas (todas las acciones deben tener URL válida)
+  const validActions = (response.action_links || []).filter((link) =>
+    isValidLink(link.url)
+  );
+
   return (
     <Card
       className={`w-full h-full flex flex-col overflow-clip ${className || ""}`}
@@ -209,13 +249,13 @@ export function ResponseCard({ response, isLoading = false, className }) {
         <h4 className="text-sm font-medium text-muted-foreground">Respuesta</h4>
         <AnimatedMarkdown content={response.answer} />
         {/* Metadatos de fuentes */}
-        {response.sources && response.sources.length > 0 && (
+        {validSources.length > 0 && (
           <>
             <h4 className="text-sm font-medium text-muted-foreground mt-2">
               Fuentes consultadas
             </h4>
             <div className="space-y-2">
-              {response.sources.map((source, index) => (
+              {validSources.map((source, index) => (
                 <SourceItem key={index} source={source} />
               ))}
             </div>
@@ -228,11 +268,11 @@ export function ResponseCard({ response, isLoading = false, className }) {
         <span className="truncate">Consulta: "{response.question}"</span>
 
         {/* Botones de acción */}
-        {response.action_links && response.action_links.length > 0 && (
-          <div className="flex flex-col gap-2 w-full items-end">
+        {validActions.length > 0 && (
+          <div className="flex flex-col gap-2 w-full items-end mt-2">
             <h4 className="text-sm font-medium">Acciones disponibles</h4>
             <div className="flex flex-wrap gap-2 justify-end">
-              {response.action_links.map((link, index) => (
+              {validActions.map((link, index) => (
                 <Button
                   key={index}
                   variant={link.type === "primary" ? "default" : "outline"}
