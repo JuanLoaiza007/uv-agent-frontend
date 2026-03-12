@@ -24,15 +24,21 @@ export function ThemeSwitcher() {
 
   // Determinar qué icono mostrar en el botón
   const renderIcon = () => {
-    if (theme === "system") return <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />;
-    if (theme === "dark") return <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    if (theme === "system")
+      return <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    if (theme === "dark")
+      return <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />;
     return <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />;
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 relative overflow-hidden group">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 sm:h-9 sm:w-9 md:h-10 md:w-10 relative overflow-hidden group"
+        >
           {renderIcon()}
           <span className="sr-only">Cambiar tema</span>
         </Button>
