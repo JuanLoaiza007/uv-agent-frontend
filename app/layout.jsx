@@ -25,12 +25,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <main className="w-full h-full">{children}</main>
           <Footer />
@@ -39,4 +34,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

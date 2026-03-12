@@ -21,13 +21,11 @@ import {
   BookOpen,
   Bot,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
 
 /**
  * Timeline - Componente que muestra el proceso de búsqueda del agente
  */
 
-const GRAYSCALE_OLD_STEPS = false;
 const REVERSE_ORDER = true;
 
 const STEP_ICONS = {
@@ -87,34 +85,22 @@ const STEP_COLORS = {
   external_search: "text-purple-500",
 };
 
-function TimelineItem({ event, isLast, grayscaleOldSteps = false, index }) {
+function TimelineItem({ event, isLast }) {
   const Icon = STEP_ICONS[event.step] || Circle;
   const colorClass = STEP_COLORS[event.step] || "text-gray-400";
   const label = STEP_LABELS[event.step] || event.step;
 
-  const isGrayscale = grayscaleOldSteps && !isLast;
-  const iconColor = isGrayscale ? "text-gray-400" : colorClass;
-  const textColor = isGrayscale ? "text-gray-400" : "";
-
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-      layout
-      className="flex items-start gap-3 pb-4"
-    >
+    <div className="flex items-start gap-3 pb-4">
       <div className="flex flex-col items-center">
-        <div className={`rounded-full p-1 ${iconColor}`}>
+        <div className={`rounded-full p-1 ${colorClass}`}>
           <Icon className="h-4 w-4" />
         </div>
         {!isLast && <div className="w-px h-full bg-border min-h-4" />}
       </div>
       <div className="flex-1 pb-2">
-        <div className={`flex items-center gap-2 ${textColor}`}>
-          <motion.span layout className="text-sm font-medium">
-            {label}
-          </motion.span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">{label}</span>
           {event.step === "domain_detected" && (
             <Badge variant="secondary" className="text-xs">
               {event.message}
@@ -122,16 +108,12 @@ function TimelineItem({ event, isLast, grayscaleOldSteps = false, index }) {
           )}
         </div>
         {event.step !== "domain_detected" && (
-          <p
-            className={`text-sm mt-0.5 ${
-              isGrayscale ? "text-gray-400" : "text-muted-foreground"
-            }`}
-          >
+          <p className="text-sm mt-0.5 text-muted-foreground">
             {event.message}
           </p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -186,17 +168,13 @@ export function Timeline({
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto px-2 sm:px-3 md:px-4 min-h-0">
         <div className="relative">
-          <AnimatePresence initial={false} mode="popLayout">
-            {displayEvents.map((event, index) => (
-              <TimelineItem
-                key={`${event.step}-${index}`}
-                event={event}
-                isLast={index === displayEvents.length - 1}
-                grayscaleOldSteps={GRAYSCALE_OLD_STEPS}
-                index={index}
-              />
-            ))}
-          </AnimatePresence>
+          {displayEvents.map((event, index) => (
+            <TimelineItem
+              key={`${event.step}-${index}`}
+              event={event}
+              isLast={index === displayEvents.length - 1}
+            />
+          ))}
         </div>
       </CardContent>
     </Card>
@@ -237,17 +215,13 @@ export function TimelineAccordion({ events = [], isLoading = false }) {
         </AccordionTrigger>
         <AccordionContent>
           <div className="relative">
-            <AnimatePresence initial={false} mode="popLayout">
-              {displayEvents.map((event, index) => (
-                <TimelineItem
-                  key={`${event.step}-${index}`}
-                  event={event}
-                  isLast={index === displayEvents.length - 1}
-                  grayscaleOldSteps={GRAYSCALE_OLD_STEPS}
-                  index={index}
-                />
-              ))}
-            </AnimatePresence>
+            {displayEvents.map((event, index) => (
+              <TimelineItem
+                key={`${event.step}-${index}`}
+                event={event}
+                isLast={index === displayEvents.length - 1}
+              />
+            ))}
           </div>
         </AccordionContent>
       </AccordionItem>
