@@ -30,11 +30,10 @@ export default function Home() {
       >
         <div className="text-center mb-6 md:mb-8">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
-            ¿En qué podemos ayudarte?
+            ¡Hola!, ¿Qué pregunta quieres resolver hoy?
           </h2>
-          <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
-            Consulta información sobre trámites y servicios de la Universidad
-            del Valle en la sede Cali, Meléndez.
+          <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
+            Ingresa tu consulta para obtener información sobre trámites y servicios de la Universidad del Valle en la sede Cali, Meléndez.
           </p>
         </div>
 
