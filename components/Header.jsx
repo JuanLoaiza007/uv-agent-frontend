@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
@@ -31,7 +32,10 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/40 backdrop-blur-xl shadow-sm">
       <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-2.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-2 sm:gap-3 select-none hover:opacity-80 transition-opacity"
+          >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#C8102E] flex items-center justify-center">
               <span className="text-white font-bold text-xs sm:text-sm">
                 UV
@@ -45,7 +49,7 @@ export function Header() {
                 Tesis Juan & Julián
               </p>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="text-xs text-center text-muted-foreground">
               {systemStatus ? (
