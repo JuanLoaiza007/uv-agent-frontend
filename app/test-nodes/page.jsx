@@ -11,7 +11,12 @@ import {
   ChevronRight,
   AlertCircle,
   CheckCircle2,
+  Moon,
+  Sun,
+  Laptop,
+  MessageSquare,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const NODE_TEMPLATES = {
   domain_detector: {
@@ -103,6 +108,29 @@ export default function TestNodesPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [prompt, setPrompt] = useState("");
+  const [promptLoading, setPromptLoading] = useState(false);
+  const { theme, resolvedTheme } = useTheme();
+
+  // Fetch node prompt when selectedNode changes
+  useEffect(() => {
+    const fetchPrompt = async () => {
+      setPromptLoading(true);
+      try {
+        const response = await fetch(
+          `http://localhost:8000/agent/v1/node-prompt/${selectedNode}`,
+        );
+        const data = await response.json();
+        setPrompt(data.prompt || "No disponible");
+      } catch (err) {
+        setPrompt("Error al cargar el prompt");
+      } finally {
+        setPromptLoading(false);
+      }
+    };
+
+    fetchPrompt();
+  }, [selectedNode]);
 
   useEffect(() => {
     setJsonInput(JSON.stringify(NODE_TEMPLATES[selectedNode], null, 2));
@@ -149,19 +177,19 @@ export default function TestNodesPage() {
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0a0a0c] text-slate-200 py-8 md:py-12 lg:py-16 overflow-y-auto">
-      <div className="max-w-6xl mx-auto">
+    <div className="flex flex-col w-full h-full bg-background text-foreground py-8 md:py-12 lg:py-16 overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-800">
+        <div className="flex items-center justify-between mb-8 pb-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+            <div className="p-2 bg-primary/10 rounded-lg text-primary">
               <Terminal size={24} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 Node Isolation Tester
               </h1>
-              <p className="text-slate-500 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Prueba el comportamiento de los prompts en total aislamiento.
               </p>
             </div>
@@ -169,7 +197,7 @@ export default function TestNodesPage() {
 
           <div className="flex items-center gap-4">
             <select
-              className="bg-[#16161a] border border-slate-800 text-slate-300 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 outline-none"
+              className="bg-secondary/50 border border-border text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 outline-none transition-colors"
               value={selectedNode}
               onChange={(e) => setSelectedNode(e.target.value)}
             >
@@ -183,10 +211,10 @@ export default function TestNodesPage() {
             <button
               onClick={handleRunTest}
               disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-indigo-500/20"
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground text-sm font-semibold rounded-lg transition-all shadow-lg shadow-primary/20"
             >
               {loading ? (
-                <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
+                <div className="animate-spin h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full" />
               ) : (
                 <Play size={16} />
               )}
@@ -195,17 +223,40 @@ export default function TestNodesPage() {
           </div>
         </div>
 
+        {/* System Prompt Section */}
+        <div className="mb-8 flex flex-col gap-4">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-widest pl-1">
+            <MessageSquare size={14} /> System Prompt Actual
+          </div>
+          <div className="relative group overflow-hidden rounded-xl border border-border bg-muted/30 ">
+            {promptLoading ? (
+              <div className="p-6 h-48 flex items-center justify-center">
+                <div className="animate-spin h-6 w-6 border-2 border-primary/30 border-t-primary rounded-full" />
+              </div>
+            ) : (
+              <pre className="p-6 text-xs font-mono text-muted-foreground whitespace-pre-wrap max-h-64 overflow-y-auto custom-scrollbar">
+                {prompt}
+              </pre>
+            )}
+            <div className="absolute top-0 right-0 p-3">
+              <div className="px-2 py-1 bg-secondary text-[10px] font-bold rounded border border-border text-muted-foreground">
+                READ-ONLY
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Panel */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest pl-1">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-widest pl-1">
               <Code size={14} /> Entrada (Simulated State)
             </div>
             <div className="relative group flex-1">
-              <div className="absolute -inset-0.5 bg-gradient-to-b from-slate-800 to-indigo-500/10 rounded-xl opacity-50 group-hover:opacity-100 transition duration-500"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-b from-border to-primary/10 rounded-xl opacity-50 group-hover:opacity-100 transition duration-500"></div>
               <textarea
-                className="relative w-full h-[600px] bg-[#0f0f12] border border-slate-800/50 rounded-xl p-6 text-sm font-mono text-indigo-100/90 outline-none focus:border-indigo-500/50 transition-colors resize-none overflow-y-auto custom-scrollbar"
+                className="relative w-11/12 h-[600px] bg-muted/30 border border-border/50 rounded-xl p-6 text-sm font-mono text-foreground outline-none focus:border-primary/50 transition-colors resize-none overflow-y-auto custom-scrollbar"
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 spellCheck={false}
@@ -216,7 +267,7 @@ export default function TestNodesPage() {
           {/* Output Panel */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pl-1">
-              <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-widest">
                 <Database size={14} /> Salida (Node Update)
               </div>
               {result && (
@@ -231,7 +282,7 @@ export default function TestNodesPage() {
                 {!result && !error && !loading && (
                   <div className="text-center">
                     <Brain size={48} className="mx-auto mb-4 opacity-10" />
-                    <p className="text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Configura el estado y presiona "Ejecutar Test"
                     </p>
                   </div>
@@ -248,7 +299,7 @@ export default function TestNodesPage() {
 
               {(result || error) && (
                 <div
-                  className={`relative w-full h-[600px] rounded-xl border overflow-y-auto custom-scrollbar p-6 text-sm font-mono ${error ? "bg-red-500/5 border-red-500/20 text-red-200" : "bg-[#0f0f12] border-slate-800 text-indigo-100/90"}`}
+                  className={`relative w-full h-[600px] rounded-xl border overflow-y-auto custom-scrollbar p-6 text-sm font-mono ${error ? "bg-destructive/5 border-destructive/20 text-destructive" : "bg-muted/30 border-border text-foreground"}`}
                 >
                   {error ? (
                     <div className="flex items-start gap-3">
@@ -275,12 +326,12 @@ export default function TestNodesPage() {
         </div>
 
         {/* Help / Footer */}
-        <div className="mt-8 p-6 rounded-xl bg-slate-900/30 border border-slate-800/50">
-          <h3 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
-            <AlertCircle size={14} className="text-indigo-400" />
+        <div className="mt-8 p-6 rounded-xl bg-muted/20 border border-border">
+          <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <AlertCircle size={14} className="text-primary" />
             Notas Técnicas
           </h3>
-          <ul className="text-sm text-slate-500 space-y-3">
+          <ul className="text-sm text-muted-foreground space-y-3">
             <li className="flex gap-2">
               <ChevronRight size={14} className="shrink-0 mt-0.5" />
               Esta herramienta instancia un `AgentSystem` real en el backend y
@@ -306,14 +357,14 @@ export default function TestNodesPage() {
           width: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #0a0a0c;
+          background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #25252d;
+          background: var(--border);
           border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #31313d;
+          background: var(--accent);
         }
         @keyframes fadeIn {
           from {
