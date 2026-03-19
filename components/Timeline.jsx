@@ -20,24 +20,27 @@ import {
   ExternalLink,
   BookOpen,
   Bot,
+  PanelsTopLeft,
+  BookOpenText,
 } from "lucide-react";
 
 /**
  * Timeline - Componente que muestra el proceso de búsqueda del agente
  */
 
-const REVERSE_ORDER = true;
+const REVERSE_ORDER = false;
 
 const STEP_ICONS = {
   planning: Search,
   domain_detected: CheckCircle2,
   vector_search: Database,
+  VectorSearch: Database,
   web_search: Globe,
   search_web_pages: Globe,
-  inspect_web_page: ExternalLink,
-  page_inspection: ExternalLink,
-  inspect_pdf_document: FileText,
-  pdf_inspection: FileText,
+  inspect_web_page: PanelsTopLeft,
+  page_inspection: PanelsTopLeft,
+  inspect_pdf_document: BookOpenText,
+  pdf_inspection: BookOpenText,
   read_pdf_section: BookOpen,
   planner: Bot,
   replanner: Bot,
@@ -45,25 +48,30 @@ const STEP_ICONS = {
   final_response: Sparkles,
   searching: Database,
   external_search: Globe,
+  executor: Search,
+  tool_handler: Search,
 };
 
 const STEP_LABELS = {
-  planning: "Analizando consulta",
-  domain_detected: "Dominio detectado",
-  vector_search: "Buscando en documentos",
-  web_search: "Buscando en internet",
-  search_web_pages: "Buscando en internet",
-  inspect_web_page: "Inspeccionando página",
-  page_inspection: "Inspeccionando página",
-  inspect_pdf_document: "Leyendo documento PDF",
-  pdf_inspection: "Leyendo documento PDF",
-  read_pdf_section: "Leyendo sección de PDF",
-  planner: "Generando plan",
-  replanner: "Evaluando progreso",
-  synthesizing: "Generando respuesta",
-  final_response: "Generando respuesta",
-  searching: "Consultando fuentes",
+  planning: "Análisis inicial",
+  domain_detected: "Clasificación de área",
+  vector_search: "Búsqueda institucional",
+  VectorSearch: "Búsqueda institucional",
+  web_search: "Búsqueda en internet",
+  search_web_pages: "Búsqueda en internet",
+  inspect_web_page: "Extracción de contenido",
+  page_inspection: "Extracción de contenido",
+  inspect_pdf_document: "Lectura de documento PDF",
+  pdf_inspection: "Lectura de documento PDF",
+  read_pdf_section: "Sección específica PDF",
+  planner: "Planificación",
+  replanner: "Re-evaluación",
+  synthesizing: "Redacción de respuesta",
+  final_response: "Respuesta final",
+  searching: "Búsqueda externa",
   external_search: "Búsqueda externa",
+  executor: "Ejecución de plan",
+  tool_handler: "Uso de herramienta",
 };
 
 const STEP_COLORS = {
@@ -88,6 +96,12 @@ const STEP_COLORS = {
 function TimelineItem({ event, isLast }) {
   const Icon = STEP_ICONS[event.step] || Circle;
   const colorClass = STEP_COLORS[event.step] || "text-gray-400";
+  
+  // Lógica de validación de mensaje dinámico
+  const genericLabels = Object.values(STEP_LABELS);
+  const isGeneric = genericLabels.includes(event.message);
+  const displayMessage = isGeneric ? `${event.message} *` : event.message;
+  
   const label = STEP_LABELS[event.step] || event.step;
 
   return (
@@ -109,7 +123,7 @@ function TimelineItem({ event, isLast }) {
         </div>
         {event.step !== "domain_detected" && (
           <p className="text-sm mt-0.5 text-muted-foreground">
-            {event.message}
+            {displayMessage}
           </p>
         )}
       </div>
