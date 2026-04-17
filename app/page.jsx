@@ -19,6 +19,7 @@ export default function Home() {
     activeDomain,
     domainConfidence,
     hasResults,
+    latency,
   } = useAgentQuery();
 
   const isError = response?.detected_domain === "error";
@@ -58,6 +59,7 @@ export default function Home() {
                 className="sm:col-span-1 max-h-45 md:max-h-50 lg:max-h-60"
                 events={timelineEvents}
                 isLoading={isLoading && timelineEvents.length === 0}
+                latency={latency}
               />
             )}
             <ResponseCard
