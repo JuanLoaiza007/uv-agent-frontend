@@ -113,12 +113,19 @@ function TimelineItem({ event, isLast }) {
         {!isLast && <div className="w-px h-full bg-border min-h-4" />}
       </div>
       <div className="flex-1 pb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{label}</span>
-          {event.step === "domain_detected" && (
-            <Badge variant="secondary" className="text-xs">
-              {event.message}
-            </Badge>
+        <div className="flex items-start justify-between w-full">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{label}</span>
+            {event.step === "domain_detected" && (
+              <Badge variant="secondary" className="text-xs">
+                {event.message}
+              </Badge>
+            )}
+          </div>
+          {event.latency !== undefined && (
+            <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
+              {(event.latency / 1000).toFixed(2)}s
+            </span>
           )}
         </div>
         {event.step !== "domain_detected" && (
@@ -152,6 +159,7 @@ export function Timeline({
   isLoading = false,
   className,
   maxEvents = Infinity,
+  latency,
 }) {
   if (isLoading) {
     return (
@@ -176,8 +184,13 @@ export function Timeline({
   return (
     <Card className={`w-full h-full flex flex-col ${className || ""}`}>
       <CardHeader className="px-3 sm:px-4 mb-0 pb-2">
-        <CardTitle className="text-sm sm:text-base">
-          Proceso de búsqueda
+        <CardTitle className="text-sm sm:text-base flex items-center justify-between">
+          <span>Proceso de búsqueda</span>
+          {latency !== undefined && latency !== null && !isLoading && (
+            <span className="text-xs font-normal text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md animate-in fade-in">
+              Latencia: {(latency / 1000).toFixed(2)}s
+            </span>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto px-2 sm:px-3 md:px-4 min-h-0">
@@ -199,7 +212,7 @@ export function Timeline({
  * TimelineAccordion - Versión en acordeón del timeline
  * Para usar cuando se quiere colapsar el timeline
  */
-export function TimelineAccordion({ events = [], isLoading = false }) {
+export function TimelineAccordion({ events = [], isLoading = false, latency }) {
   if (isLoading) {
     return (
       <Accordion type="single" collapsible defaultValue="timeline">
@@ -225,7 +238,14 @@ export function TimelineAccordion({ events = [], isLoading = false }) {
     <Accordion type="single" collapsible defaultValue="timeline">
       <AccordionItem value="timeline">
         <AccordionTrigger className="text-sm sm:text-base">
-          Proceso de búsqueda ({events.length} pasos)
+          <div className="flex items-center justify-between w-full pr-2">
+            <span>Proceso de búsqueda ({events.length} pasos)</span>
+            {latency !== undefined && latency !== null && !isLoading && (
+              <span className="text-xs font-normal text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md animate-in fade-in">
+                {(latency / 1000).toFixed(2)}s
+              </span>
+            )}
+          </div>
         </AccordionTrigger>
         <AccordionContent>
           <div className="relative">
