@@ -28,53 +28,7 @@ import {
  * Timeline - Componente que muestra el proceso de búsqueda del agente
  */
 
-const REVERSE_ORDER = true;
-
-function TimelineBoundary({ label }) {
-  return (
-    <div className="flex items-center gap-3 py-2 text-xs text-muted-foreground">
-      <div className="h-px flex-1 bg-border/60" />
-      <span className="whitespace-nowrap">{label}</span>
-      <div className="h-px flex-1 bg-border/60" />
-    </div>
-  );
-}
-
-function TimelinePending({ isLast }) {
-  return (
-    <div className="flex items-start gap-3 pb-4" role="status" aria-live="polite">
-      <div className="flex flex-col items-center">
-        <div className="flex h-6 items-center gap-1 rounded-full p-1 text-primary">
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current" />
-        </div>
-        {!isLast && <div className="w-px h-full bg-border min-h-4" />}
-      </div>
-      <div className="flex-1 pb-2 pt-1">
-        <span className="sr-only">La consulta continúa en proceso</span>
-      </div>
-    </div>
-  );
-}
-
-function getBoundaryLabels(isTruncated, isComplete) {
-  if (REVERSE_ORDER) {
-    return {
-      top: isComplete ? "Fin de la consulta" : null,
-      bottom: isTruncated ? "Más eventos anteriores..." : "Inicio de la consulta",
-    };
-  }
-
-  return {
-    top: "Inicio de la consulta",
-    bottom: isTruncated
-      ? "Más eventos posteriores..."
-      : isComplete
-        ? "Fin de la consulta"
-        : null,
-  };
-}
+const REVERSE_ORDER = false;
 
 const STEP_ICONS = {
   planning: Search,
@@ -168,9 +122,9 @@ function TimelineItem({ event, isLast }) {
               </Badge>
             )}
           </div>
-          {typeof event.duration_ms === "number" && (
+          {event.latency !== undefined && (
             <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
-              {(event.duration_ms / 1000).toFixed(2)}s
+              {(event.latency / 1000).toFixed(2)}s
             </span>
           )}
         </div>
@@ -206,8 +160,6 @@ export function Timeline({
   className,
   maxEvents = Infinity,
   latency,
-  isComplete = false,
-  isProcessing = false,
 }) {
   if (isLoading) {
     return (
@@ -226,29 +178,23 @@ export function Timeline({
     return null;
   }
 
-  const orderedEvents = REVERSE_ORDER ? [...events].reverse() : [...events];
-  const isTruncated = Number.isFinite(maxEvents) && orderedEvents.length > maxEvents;
-  const displayEvents = orderedEvents.slice(0, maxEvents);
-  const boundaryLabels = getBoundaryLabels(isTruncated, isComplete);
+  let displayEvents = REVERSE_ORDER ? [...events].reverse() : events;
+  displayEvents = displayEvents.slice(0, maxEvents);
 
   return (
     <Card className={`w-full h-full flex flex-col ${className || ""}`}>
       <CardHeader className="px-3 sm:px-4 mb-0 pb-2">
-        <CardTitle className="text-sm sm:text-base flex items-center justify-between gap-2">
+        <CardTitle className="text-sm sm:text-base flex items-center justify-between">
           <span>Proceso de búsqueda</span>
-          {typeof latency === "number" && !isLoading && (
+          {latency !== undefined && latency !== null && !isLoading && (
             <span className="text-xs font-normal text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md animate-in fade-in">
-              Tiempo total: {(latency / 1000).toFixed(2)}s
+              Latencia: {(latency / 1000).toFixed(2)}s
             </span>
           )}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto px-2 sm:px-3 md:px-4 min-h-0">
         <div className="relative">
-          {boundaryLabels.top && <TimelineBoundary label={boundaryLabels.top} />}
-          {REVERSE_ORDER && isProcessing && displayEvents.length > 0 && (
-            <TimelinePending isLast={false} />
-          )}
           {displayEvents.map((event, index) => (
             <TimelineItem
               key={`${event.step}-${index}`}
@@ -256,10 +202,6 @@ export function Timeline({
               isLast={index === displayEvents.length - 1}
             />
           ))}
-          {!REVERSE_ORDER && isProcessing && displayEvents.length > 0 && (
-            <TimelinePending isLast />
-          )}
-          {boundaryLabels.bottom && <TimelineBoundary label={boundaryLabels.bottom} />}
         </div>
       </CardContent>
     </Card>
@@ -270,13 +212,7 @@ export function Timeline({
  * TimelineAccordion - Versión en acordeón del timeline
  * Para usar cuando se quiere colapsar el timeline
  */
-export function TimelineAccordion({
-  events = [],
-  isLoading = false,
-  latency,
-  isComplete = false,
-  isProcessing = false,
-}) {
+export function TimelineAccordion({ events = [], isLoading = false, latency }) {
   if (isLoading) {
     return (
       <Accordion type="single" collapsible defaultValue="timeline">
@@ -296,8 +232,7 @@ export function TimelineAccordion({
     return null;
   }
 
-  const orderedEvents = REVERSE_ORDER ? [...events].reverse() : [...events];
-  const boundaryLabels = getBoundaryLabels(false, isComplete);
+  const displayEvents = REVERSE_ORDER ? [...events].reverse() : events;
 
   return (
     <Accordion type="single" collapsible defaultValue="timeline">
@@ -305,30 +240,22 @@ export function TimelineAccordion({
         <AccordionTrigger className="text-sm sm:text-base">
           <div className="flex items-center justify-between w-full pr-2">
             <span>Proceso de búsqueda ({events.length} pasos)</span>
-            {typeof latency === "number" && !isLoading && (
+            {latency !== undefined && latency !== null && !isLoading && (
               <span className="text-xs font-normal text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md animate-in fade-in">
-                Tiempo total: {(latency / 1000).toFixed(2)}s
+                {(latency / 1000).toFixed(2)}s
               </span>
             )}
           </div>
         </AccordionTrigger>
         <AccordionContent>
           <div className="relative">
-            {boundaryLabels.top && <TimelineBoundary label={boundaryLabels.top} />}
-            {REVERSE_ORDER && isProcessing && orderedEvents.length > 0 && (
-              <TimelinePending isLast={false} />
-            )}
-            {orderedEvents.map((event, index) => (
+            {displayEvents.map((event, index) => (
               <TimelineItem
                 key={`${event.step}-${index}`}
                 event={event}
-                isLast={index === orderedEvents.length - 1}
+                isLast={index === displayEvents.length - 1}
               />
             ))}
-            {!REVERSE_ORDER && isProcessing && orderedEvents.length > 0 && (
-              <TimelinePending isLast />
-            )}
-            {boundaryLabels.bottom && <TimelineBoundary label={boundaryLabels.bottom} />}
           </div>
         </AccordionContent>
       </AccordionItem>

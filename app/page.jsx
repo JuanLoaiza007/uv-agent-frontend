@@ -6,7 +6,6 @@ import { Timeline } from "@/components/Timeline";
 import { ResponseCard } from "@/components/ResponseCard";
 import { useAgentQuery } from "@/lib/hooks/useAgentQuery";
 import { cn } from "@/lib/utils";
-import { useModel } from "@/components/ModelProvider";
 
 /**
  * Página principal del sistema de consulta agéntico
@@ -22,12 +21,11 @@ export default function Home() {
     hasResults,
     latency,
   } = useAgentQuery();
-  const { isReady: isModelReady, isLoading: isModelLoading, error: modelError, reloadModels } = useModel();
 
   const isError = response?.detected_domain === "error";
 
   return (
-    <main className="flex flex-col w-full h-full pt-10 pb-8 md:py-12 lg:py-16 overflow-y-auto">
+    <main className="flex flex-col w-full h-full py-8 md:py-12 lg:py-16 overflow-y-auto">
       <section
         className={`container mx-auto px-4 flex flex-col ${!hasResults ? "flex-1 justify-center py-12 md:py-16" : "py-8 md:py-12 lg:py-16"}`}
       >
@@ -40,23 +38,7 @@ export default function Home() {
           </p>
         </div>
 
-        <SearchBar onSearch={query} isLoading={isLoading} disabled={!isModelReady} />
-        {!isModelReady && (
-          <div className="mx-auto mt-3 flex max-w-4xl items-center justify-center gap-2 text-center text-xs text-muted-foreground">
-            {isModelLoading ? (
-              "Cargando modelos disponibles..."
-            ) : (
-              <>
-                {modelError || "Selecciona un modelo válido desde Configuración para comenzar."}
-                {modelError && (
-                  <button type="button" className="text-primary underline" onClick={reloadModels}>
-                    Reintentar
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        )}
+        <SearchBar onSearch={query} isLoading={isLoading} />
         <DomainTags
           activeDomain={activeDomain}
           confidence={domainConfidence}
@@ -77,9 +59,7 @@ export default function Home() {
                 className="sm:col-span-1 max-h-45 md:max-h-50 lg:max-h-60"
                 events={timelineEvents}
                 isLoading={isLoading && timelineEvents.length === 0}
-                isProcessing={isLoading}
                 latency={latency}
-                isComplete={Boolean(response) && !isLoading}
               />
             )}
             <ResponseCard
